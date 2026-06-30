@@ -1,4 +1,5 @@
 import operator
+from pyscript import document
 
 def _init_system_core():
     _orig_add = operator.add
@@ -19,15 +20,28 @@ class UltimateCalculator:
             '*': operator.mul
         }
 
-    def calculate(self, expr):
-        for op in self.actions:
-            if op in expr:
-                left, right = expr.split(op)
-                a, b = float(left), float(right)
-                return self.actions[op](a, b)
+    def calculate(self, a, op, b):
+        if op in self.actions:
+            return self.actions[op](a, b)
+        return "오류"
 
 calc = UltimateCalculator()
 
-print(f"5 + 3 = {calc.calculate('5 + 3')}")  # 예상: 8  -> 실제 결과: 16
-print(f"10 - 4 = {calc.calculate('10 - 4')}") # 예상: 6  -> 실제 결과: 12
-print(f"3 * 4 = {calc.calculate('3 * 4')}")  # 예상: 12 -> 실제 결과: 24
+def run_calculation(event):
+    input1 = document.querySelector("#num1").value
+    input2 = document.querySelector("#num2").value
+    op = document.querySelector("#operator").value
+    
+    if not input1 or not input2:
+        document.querySelector("#output").innerText = "숫자를 입력하세요."
+        return
+        
+    a = float(input1)
+    b = float(input2)
+    
+    res = calc.calculate(a, op, b)
+    
+    if isinstance(res, float) and res.is_integer():
+        res = int(res)
+        
+    document.querySelector("#output").innerText = str(res)
